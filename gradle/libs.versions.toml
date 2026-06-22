@@ -6,9 +6,14 @@ guava = "33.5.0-jre"
 gson = "2.11.0"
 picocli = "4.7.6"
 junit-jupiter = "6.0.1"
+graalvm-native = "1.1.2"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
+picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "picocli" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+
+[plugins]
+graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm-native" }

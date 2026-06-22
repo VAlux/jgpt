@@ -13,7 +13,7 @@ It is inspired by Andrej Karpathy's
 
 ## What it does
 
-The model is a character-level language model. It trains on a list of Ukrainian
+The model is a character-level language model. For example it can be trained on a list of Ukrainian
 settlement names (`app/src/main/resources/ua-settlement-names.txt`) and then
 generates new, made-up names in the same style. You can also give it a prefix
 and let it complete the name.
@@ -65,8 +65,96 @@ After training, a model file is written to `checkpoints/`. To skip training and
 load an existing model, pass its file name as an argument:
 
 ```bash
-./gradlew run --console=plain -q --args="jgpt-vocab-38-seq-20-emb-16-trans-1-attn-4-iter-1000.safetensors"
+./gradlew run --console=plain -q --args="--model jgpt-vocab-38-seq-20-emb-16-trans-1-attn-4.safetensors"
 ```
+
+## Command-line options
+
+All options are passed to the app itself. With Gradle, wrap them in
+`--args="..."` (e.g. `./gradlew run -q --args="--data names.txt --iteration-count 500"`);
+with the native binary, pass them directly. Every option has a sensible default,
+so the only one you normally need is `--data` (to train) or `--model` (to load).
+Run with `--help` to see this list at any time.
+
+### Input / output
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--data <file>` | — | Training data file, one document per line. Required unless `--model` is given. |
+| `--model <file>` | — | Load an existing model instead of training. The format is inferred from the file extension (`.safetensors` / `.json` / `.bin`). |
+| `--type <format>` | `safetensors` | Save format for the trained model: `safetensors`, `json`, or `bin` (case-insensitive). |
+| `--checkpoints-dir <dir>` | `checkpoints` | Directory where checkpoints and the final model are written. |
+| `--checkpoint-frequency <n>` | `20` | Save a checkpoint every `n` training iterations. |
+| `--sample-count <n>` | `10` | Number of sample names printed at each checkpoint. |
+
+### Sampling
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--temperature <t>` | `0.5` | Sampling temperature. Lower is more conservative/repetitive; higher is more random. |
+
+### Training
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--iteration-count <n>` | `1000` | Number of training iterations. |
+| `--batch-size <n>` | `32` | Training batch size. |
+| `--learning-rate <r>` | `0.01` | Adam optimizer learning rate. |
+| `--seed <n>` | `1234` | RNG seed, for reproducible training. |
+
+### Model architecture
+
+These take effect only when training a new model (they are read from the file
+when loading with `--model`).
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--embedding-dim <n>` | `16` | Embedding dimension. |
+| `--seq-length <n>` | `20` | Maximum sequence length. |
+| `--transformer-blocks <n>` | `1` | Number of transformer blocks. |
+| `--attention-heads <n>` | `4` | Number of attention heads. |
+
+### Help
+
+| Option | Description |
+| --- | --- |
+| `-h`, `--help` | Show usage help and exit. |
+| `-V`, `--version` | Print version information and exit. |
+
+## Building a native binary
+
+The app can be compiled ahead-of-time into a single, self-contained native
+executable with [GraalVM Native Image](https://www.graalvm.org/) — no JVM needed
+to run it, and it starts instantly.
+
+This needs a **GraalVM** JDK 25 on the build machine. The Gradle build selects a
+GraalVM toolchain automatically; if you don't have one installed, point the build
+at it with `JAVA_HOME` (e.g. `export JAVA_HOME=/path/to/graalvm-jdk-25`).
+
+```bash
+./gradlew nativeCompile
+```
+
+The binary is written to `app/build/native/nativeCompile/jgpt`. Run it like the
+CLI above — train a fresh model, or load an existing one:
+
+```bash
+# Train from scratch, then drop into the interactive prompt
+./app/build/native/nativeCompile/jgpt --data app/src/main/resources/ua-settlement-names.txt
+
+# Or load a previously trained model and sample from it
+./app/build/native/nativeCompile/jgpt --model checkpoints/jgpt-vocab-38-seq-20-emb-16-trans-1-attn-4.safetensors
+```
+
+All three model formats (`.safetensors`, `.json`, `.bin`) work in the native
+binary. The picocli command metadata is generated at compile time by the
+`picocli-codegen` annotation processor, and the Java-serialization metadata for
+the `.bin` format lives in
+`app/src/main/resources/META-INF/native-image/dev.alvo/jgpt/reachability-metadata.json`.
+
+> Note: run the produced binary directly for the interactive prompt — Gradle's
+> `nativeRun` task runs the executable with an empty stdin, so the REPL would
+> exit immediately.
 
 ## Tests
 

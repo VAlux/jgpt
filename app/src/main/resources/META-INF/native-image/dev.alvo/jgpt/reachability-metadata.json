@@ -1,0 +1,64 @@
+{
+  "reflection": [
+    {
+      "type": "dev.alvo.repository.serialization.ModelDataSerializer$ModelData",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.model.ModelParams",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.model.Matrix",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.model.Vector",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.grad.AutoGradNode",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.grad.GradNodeTopologicalLookupState",
+      "serializable": true
+    },
+    {
+      "type": "dev.alvo.tokenizer.CodePointTokenizer",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Enum",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Number",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Integer",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Double",
+      "serializable": true
+    },
+    {
+      "type": "java.util.ArrayList",
+      "serializable": true
+    },
+    {
+      "type": "java.util.HashMap",
+      "serializable": true
+    },
+    {
+      "type": "java.util.CollSer",
+      "serializable": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$ListN",
+      "serializable": true
+    }
+  ]
+}

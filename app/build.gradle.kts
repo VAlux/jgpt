@@ -8,6 +8,8 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    // GraalVM Native Build Tools: compile the application into a single native binary.
+    alias(libs.plugins.graalvm.native)
 }
 
 repositories {
@@ -29,6 +31,10 @@ dependencies {
 
     // Picocli powers the command-line interface.
     implementation(libs.picocli)
+
+    // Generates GraalVM reflection/resource metadata for the picocli command at compile time so the
+    // CLI works in a native image without hand-written configuration.
+    annotationProcessor(libs.picocli.codegen)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -47,6 +53,37 @@ tasks.named<JavaExec>("run") {
     // Connect the console's stdin so the interactive REPL can read user input.
     standardInput = System.`in`
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    // Tell the picocli annotation processor where to emit the generated native-image metadata.
+    options.compilerArgs.add("-Aproject=dev.alvo/jgpt")
+}
+
+// Configure the GraalVM native binary.
+//
+// Build it with:   ./gradlew nativeCompile      (binary at app/build/native/nativeCompile/jgpt)
+// Build & run it:  ./gradlew nativeRun --args="--data path/to/data.txt"
+//
+// Requires a GraalVM JDK on the build machine; the plugin selects a GraalVM toolchain automatically.
+graalvmNative {
+    // Pull serialization/reflection metadata for third-party libraries (Gson) and the JDK from the
+    // shared GraalVM reachability-metadata repository.
+    metadataRepository {
+        enabled = true
+    }
+
+    binaries {
+        named("main") {
+            imageName = "jgpt"
+            mainClass = "dev.alvo.JGPT"
+            buildArgs.add("-O3")
+        }
+    }
+}
+
+// Note: the interactive REPL needs a real console stdin. Gradle's `nativeRun` task runs the binary
+// with an empty stdin, so for interactive use run the produced binary directly:
+//   ./gradlew nativeCompile && ./app/build/native/nativeCompile/jgpt --model some-model.safetensors
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.

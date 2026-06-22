@@ -44,10 +44,12 @@ public class Runner {
 
   public ModelData train(Tokenizer tokenizer,
                          List<String> documents,
-                         int batchSize,
-                         int iterationCount,
-                         int checkpointFrequency,
+                         TrainingConfig config,
                          Random random) {
+
+    var batchSize = config.batchSize();
+    var iterationCount = config.iterationCount();
+    var checkpointFrequency = config.checkpointFrequency();
 
     System.out.println("> Started tokenizer training...");
     tokenizer.train(documents);
@@ -55,15 +57,15 @@ public class Runner {
 
     var params = ModelParams.create(
       tokenizer.getVocabularySize(),
-      16,
-      20,
-      1,
+      config.embeddingDimension(),
+      config.maxSequenceLength(),
+      config.transformerBlockCount(),
       4,
-      4,
+      config.attentionHeadCount(),
       random
     );
 
-    var optimizer = new AdamOptimizer(0.01, params.flatten(), 0.9d, 0.999d, 1e-8d);
+    var optimizer = new AdamOptimizer(config.learningRate(), params.flatten(), 0.9d, 0.999d, 1e-8d);
 
     var encodedDocs = documents.stream()
       .map(tokenizer::encode)
@@ -130,8 +132,7 @@ public class Runner {
       if (finishedIterationIndex % checkpointFrequency == 0) {
         System.out.printf("Checkpoint after %d", finishedIterationIndex);
         this.dataRepository.save(new ModelData(params, tokenizer), "iter-" + finishedIterationIndex);
-        this.sample("", params, tokenizer, 10, 0.5d, random);
-        this.sample("", params, tokenizer, 10, 1.0d, random);
+        this.sample("", params, tokenizer, config.sampleCount(), config.temperature(), random);
       }
     }
 

@@ -26,6 +26,9 @@ dependencies {
 
     // Gson is used to read/write the safetensors JSON header.
     implementation(libs.gson)
+
+    // Picocli powers the command-line interface.
+    implementation(libs.picocli)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

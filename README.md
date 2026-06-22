@@ -52,9 +52,20 @@ as PyTorch or NumPy.
 Once training is done, type a prefix at the `|>` prompt and press Enter to get a
 generated name, or just press Enter on an empty line (or type `/q`) to quit.
 
+Example for the included Ukrainian settlement names dataset sampling:
 ```
-|> КИ
-КИЇВКА
+|> за
+ЗАРОНА
+|> пере
+ПЕРЕЗІВКА
+|> над
+НАДІНКИ
+|> тест
+ТЕСТОЛО
+|> ін
+ІНКОРОВО
+|> по
+ПОРОВИНЕ
 |> /q
 Good bye!
 ```

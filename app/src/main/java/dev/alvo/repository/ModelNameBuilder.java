@@ -9,7 +9,17 @@ public class ModelNameBuilder {
 
   private static final String DELIMITER = "-";
   private static final String PREFIX = "jgpt";
-  private static final String EXTENSION = ".bin";
+  private static final String DEFAULT_EXTENSION = ".bin";
+
+  private final String extension;
+
+  public ModelNameBuilder() {
+    this(DEFAULT_EXTENSION);
+  }
+
+  public ModelNameBuilder(String extension) {
+    this.extension = extension;
+  }
 
   public String build(ModelParams params, String suffix) {
     var parts = new ArrayList<>(List.of(
@@ -25,6 +35,6 @@ public class ModelNameBuilder {
       parts.add(suffix);
     }
 
-    return String.join(DELIMITER, parts) + EXTENSION;
+    return String.join(DELIMITER, parts) + extension;
   }
 }

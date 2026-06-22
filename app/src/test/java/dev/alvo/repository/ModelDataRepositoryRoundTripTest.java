@@ -3,10 +3,12 @@ package dev.alvo.repository;
 import dev.alvo.model.ModelParams;
 import dev.alvo.repository.serialization.ByteArrayModelDataSerializer;
 import dev.alvo.repository.serialization.ModelDataSerializer.ModelData;
+import dev.alvo.repository.serialization.SafeTensorsModelDataSerializer;
 import dev.alvo.repository.storage.ByteArrayModelDataStorage;
 import dev.alvo.tokenizer.CodePointTokenizer;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,33 @@ class ModelDataRepositoryRoundTripTest {
     Optional<ModelData> loaded = repository.load(fileName);
     assertTrue(loaded.isPresent(), "model should load by the name the builder produced");
     assertEquals(params.getVocabularySize(), loaded.get().params().getVocabularySize());
+  }
+
+  @Test
+  void savesAndLoadsSafetensorsCheckpoints(@org.junit.jupiter.api.io.TempDir Path tmp) {
+    // Mirrors how JGPT wires the repository: safetensors serializer + a ".safetensors" name.
+    var nameBuilder = new ModelNameBuilder(".safetensors");
+    var repository = new ModelDataRepository<>(
+      tmp.toString(),
+      new SafeTensorsModelDataSerializer(),
+      new ByteArrayModelDataStorage(),
+      nameBuilder);
+
+    var tokenizer = new CodePointTokenizer();
+    tokenizer.train(List.of("kyiv", "lviv"));
+    var params = ModelParams.create(tokenizer.getVocabularySize(), 16, 20, 1, 4, 4, new Random(1));
+
+    repository.save(new ModelData(params, tokenizer));
+
+    var fileName = nameBuilder.build(params, "");
+    assertEquals("jgpt-vocab-8-seq-20-emb-16-trans-1-attn-4.safetensors", fileName,
+      "checkpoints should carry the .safetensors extension");
+    assertTrue(Files.exists(tmp.resolve(fileName)), "a real safetensors file should be on disk");
+
+    Optional<ModelData> loaded = repository.load(fileName);
+    assertTrue(loaded.isPresent(), "the safetensors checkpoint should load back");
+    assertEquals(params.getVocabularySize(), loaded.get().params().getVocabularySize());
+    assertEquals(params.transformerBlockCount(), loaded.get().params().transformerBlockCount());
   }
 
   @Test

@@ -23,6 +23,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // Gson is used to read/write the safetensors JSON header.
+    implementation(libs.gson)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

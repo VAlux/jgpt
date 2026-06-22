@@ -44,7 +44,10 @@ the way, so the model's training output and the interactive prompt stay clean
 and readable. They are recommended for the best experience.
 
 During training the app periodically saves checkpoints into the `checkpoints/`
-directory and prints a few sample names so you can watch it improve.
+directory and prints a few sample names so you can watch it improve. Checkpoints
+are written in the [safetensors](https://github.com/huggingface/safetensors)
+format (`.safetensors`), so the weights can also be loaded by other tooling such
+as PyTorch or NumPy.
 
 Once training is done, type a prefix at the `|>` prompt and press Enter to get a
 generated name, or just press Enter on an empty line (or type `/q`) to quit.
@@ -62,7 +65,7 @@ After training, a model file is written to `checkpoints/`. To skip training and
 load an existing model, pass its file name as an argument:
 
 ```bash
-./gradlew run --console=plain -q --args="jgpt-vocab-38-seq-20-emb-16-trans-1-attn-4-iter-1000.bin"
+./gradlew run --console=plain -q --args="jgpt-vocab-38-seq-20-emb-16-trans-1-attn-4-iter-1000.safetensors"
 ```
 
 ## Tests

@@ -4,8 +4,8 @@ import dev.alvo.model.Model;
 import dev.alvo.repository.DataRepository;
 import dev.alvo.repository.ModelDataRepository;
 import dev.alvo.repository.ModelNameBuilder;
-import dev.alvo.repository.serialization.ByteArrayModelDataSerializer;
 import dev.alvo.repository.serialization.ModelDataSerializer.ModelData;
+import dev.alvo.repository.serialization.SafeTensorsModelDataSerializer;
 import dev.alvo.repository.storage.ByteArrayModelDataStorage;
 import dev.alvo.tokenizer.CodePointTokenizer;
 
@@ -22,6 +22,7 @@ import java.util.random.RandomGenerator;
 public class JGPT {
 
   private static final String CHECKPOINTS_DIRECTORY = "checkpoints";
+  private static final String SAFETENSORS_EXTENSION = ".safetensors";
 
   static void main(String[] args) {
     trapExceptions();
@@ -30,12 +31,12 @@ public class JGPT {
 
     var random = new Random(1234);
     var randomGenerator = RandomGenerator.getDefault();
-    var nameBuilder = new ModelNameBuilder();
+    var nameBuilder = new ModelNameBuilder(SAFETENSORS_EXTENSION);
 
-    // Simple java serialization for now.
+    // Checkpoints are written in the safetensors format.
     var repository = new ModelDataRepository<>(
       CHECKPOINTS_DIRECTORY,
-      new ByteArrayModelDataSerializer(),
+      new SafeTensorsModelDataSerializer(),
       new ByteArrayModelDataStorage(),
       nameBuilder);
 

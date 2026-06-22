@@ -44,8 +44,8 @@ public class GradNodeOperationDSL {
 
   public static AutoGradNode sum(List<AutoGradNode> nodes) {
     var sum = nodes.stream().mapToDouble(AutoGradNode::value).sum();
-    double[] gradsArray = new double[nodes.size()];
-    Arrays.fill(gradsArray, 1d);
+    float[] gradsArray = new float[nodes.size()];
+    Arrays.fill(gradsArray, 1f);
 
     return new AutoGradNode(sum, gradsArray, nodes);
   }

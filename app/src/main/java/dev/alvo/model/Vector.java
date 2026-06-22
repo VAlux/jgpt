@@ -100,23 +100,25 @@ public record Vector(List<AutoGradNode> nodes) implements Serializable {
     var size = this.nodes.size();
     var value = 0d;
     var children = new ArrayList<AutoGradNode>(size * 2);
-    var childGrads = new ArrayList<Double>(size * 2);
+    var childGrads = new float[size * 2];
 
     for (int i = 0; i < size; i++) {
       var currentNodes = this.nodes.get(i);
       var otherNodes = other.nodes.get(i);
 
-      // result = sum(a_i * b_i)  =>  d/d(a_i) = b_i, d/d(b_i) = a_i
+      // result = sum(a_i * b_i)  =>  d/d(a_i) = b_i, d/d(b_i) = a_i.
+      // Accumulate the value in double; store the local gradients as float.
       value += currentNodes.value() * otherNodes.value();
 
+      var j = i * 2;
       children.add(currentNodes);
       children.add(otherNodes);
 
-      childGrads.add(otherNodes.value());
-      childGrads.add(currentNodes.value());
+      childGrads[j] = (float) otherNodes.value();
+      childGrads[j + 1] = (float) currentNodes.value();
     }
 
-    return new AutoGradNode(value, childGrads.stream().mapToDouble(Double::doubleValue).toArray(), children);
+    return new AutoGradNode(value, childGrads, children);
   }
 
   /**

@@ -13,9 +13,9 @@ public final class AutoGradNode implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  private double value;
+  private float value;
   private double grad;
-  private double[] childGrads;
+  private float[] childGrads;
   private List<AutoGradNode> children;
   private GradNodeTopologicalLookupState topologicalState = GradNodeTopologicalLookupState.UNVISITED;
 
@@ -24,17 +24,17 @@ public final class AutoGradNode implements Serializable {
   }
 
   public AutoGradNode(double value) {
-    this(value, 0d, new double[0], List.of());
+    this(value, 0d, new float[0], List.of());
   }
 
-  public AutoGradNode(double value, double grad, double[] childGrads, List<AutoGradNode> children) {
-    this.value = value;
+  public AutoGradNode(double value, double grad, float[] childGrads, List<AutoGradNode> children) {
+    this.value = (float) value;
     this.grad = grad;
     this.childGrads = childGrads;
     this.children = children;
   }
 
-  public AutoGradNode(double value, double[] childGrads, List<AutoGradNode> children) {
+  public AutoGradNode(double value, float[] childGrads, List<AutoGradNode> children) {
     this(value, 0d, childGrads, children);
   }
 
@@ -43,7 +43,7 @@ public final class AutoGradNode implements Serializable {
   }
 
   public void setValue(double value) {
-    this.value = value;
+    this.value = (float) value;
   }
 
   public double grad() {
@@ -54,11 +54,11 @@ public final class AutoGradNode implements Serializable {
     this.grad = grad;
   }
 
-  public double[] childGrads() {
+  public float[] childGrads() {
     return this.childGrads;
   }
 
-  public void setChildGrads(double[] childGrads) {
+  public void setChildGrads(float[] childGrads) {
     this.childGrads = childGrads;
   }
 

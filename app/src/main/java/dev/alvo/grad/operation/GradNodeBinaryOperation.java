@@ -21,7 +21,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         left.value() + right.value(),
-        new double[]{1d, 1d},
+        new float[]{1f, 1f},
         List.of(left, right));
     }
 
@@ -29,7 +29,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
     public AutoGradNode left(AutoGradNode left, double value) {
       return new AutoGradNode(
         left.value() + value,
-        new double[]{1d},
+        new float[]{1f},
         List.of(left));
     }
 
@@ -48,7 +48,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         left.value() - right.value(),
-        new double[]{1d, -1d},
+        new float[]{1f, -1f},
         List.of(left, right));
     }
 
@@ -56,7 +56,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
     public AutoGradNode left(AutoGradNode left, double value) {
       return new AutoGradNode(
         left.value() - value,
-        new double[]{1d},
+        new float[]{1f},
         List.of(left));
     }
 
@@ -64,7 +64,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
     public AutoGradNode right(double value, AutoGradNode right) {
       return new AutoGradNode(
         value - right.value(),
-        new double[]{-1d},
+        new float[]{-1f},
         List.of(right));
     }
   }
@@ -74,7 +74,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
     public AutoGradNode nodes(AutoGradNode left, AutoGradNode right) {
       return new AutoGradNode(
         left.value() * right.value(),
-        new double[]{right.value(), left.value()},
+        new float[]{(float) right.value(), (float) left.value()},
         List.of(left, right)
       );
     }
@@ -86,7 +86,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         left.value() * value,
-        new double[]{value},
+        new float[]{(float) value},
         List.of(left)
       );
     }
@@ -106,7 +106,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         left.value() / right.value(),
-        new double[]{1d / right.value(), -left.value() / Math.pow(right.value(), 2)},
+        new float[]{(float) (1d / right.value()), (float) (-left.value() / Math.pow(right.value(), 2))},
         List.of(left, right)
       );
     }
@@ -118,7 +118,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         left.value() / value,
-        new double[]{1d / value},
+        new float[]{(float) (1d / value)},
         List.of(left)
       );
     }
@@ -130,7 +130,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         value / right.value(),
-        new double[]{-value / Math.pow(right.value(), 2)},
+        new float[]{(float) (-value / Math.pow(right.value(), 2))},
         List.of(right)
       );
     }
@@ -147,9 +147,9 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         value,
-        new double[]{
-          right.value() * Math.pow(left.value(), right.value() - 1),
-          value * Math.log(left.value())
+        new float[]{
+          (float) (right.value() * Math.pow(left.value(), right.value() - 1)),
+          (float) (value * Math.log(left.value()))
         },
         List.of(left, right)
       );
@@ -162,7 +162,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         Math.pow(left.value(), value),
-        new double[]{value * Math.pow(left.value(), value - 1)},
+        new float[]{(float) (value * Math.pow(left.value(), value - 1))},
         List.of(left)
       );
     }
@@ -174,7 +174,7 @@ sealed interface GradNodeBinaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         Math.pow(value, right.value()),
-        new double[]{Math.pow(value, right.value()) * Math.log(value)},
+        new float[]{(float) (Math.pow(value, right.value()) * Math.log(value))},
         List.of(right)
       );
     }

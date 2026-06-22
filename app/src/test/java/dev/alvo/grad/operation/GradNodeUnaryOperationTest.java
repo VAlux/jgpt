@@ -11,14 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class GradNodeUnaryOperationTest {
 
-  private static final double DELTA = 1e-9;
+  // Values are stored as float (~1e-7 precision), so assertions use a float-scale tolerance.
+  private static final double DELTA = 1e-5;
 
   private static AutoGradNode leaf(double value) {
-    return new AutoGradNode(value, new double[0], List.of());
+    return new AutoGradNode(value, new float[0], List.of());
   }
 
   private static void assertChildGrads(AutoGradNode node, double... expected) {
-    double[] actual = node.childGrads();
+    float[] actual = node.childGrads();
     assertEquals(expected.length, actual.length, "child-grad count");
     for (int i = 0; i < expected.length; i++) {
       assertEquals(expected[i], actual[i], DELTA, "child-grad[" + i + "]");

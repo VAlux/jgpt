@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AdamOptimizerTest {
 
-  private static final double DELTA = 1e-9;
+  // Parameters are stored as float (~1e-7 precision), so assertions use a float-scale tolerance.
+  private static final double DELTA = 1e-5;
 
   private static final double BETA1 = 0.9d;
   private static final double BETA2 = 0.999d;
@@ -19,7 +20,7 @@ class AdamOptimizerTest {
 
   /** A parameter node seeded with a value and a pending gradient. */
   private static AutoGradNode param(double value, double grad) {
-    return new AutoGradNode(value, grad, new double[0], List.of());
+    return new AutoGradNode(value, grad, new float[0], List.of());
   }
 
   @Nested
@@ -96,10 +97,10 @@ class AdamOptimizerTest {
   class BiasCorrection {
 
     @Test
-    void biasCorrectionDiffersBetweenFirstAndSecondStep() {
-      // With a constant gradient, the per-step displacement is not constant because
-      // the bias-corrected estimates evolve with the timestep. The first step has the
-      // largest displacement; the second is strictly smaller.
+    void biasCorrectionKeepsConstantGradientStepStable() {
+      // With a constant gradient, bias correction makes m̂_t = g and v̂_t = g² for every t, so the
+      // update lr·m̂/(√v̂ + ε) is the same at every step. The point of bias correction is precisely
+      // that the very first step is already a full lr-scaled step rather than a suppressed one.
       double lr = 0.1d;
       double grad = 0.5d;
 
@@ -114,9 +115,10 @@ class AdamOptimizerTest {
       optimizer.step();
       double secondDisplacement = Math.abs(p.value() - afterFirst);
 
-      assertTrue(secondDisplacement < firstDisplacement,
-        "second step displacement (" + secondDisplacement + ") should be smaller than first ("
-          + firstDisplacement + ")");
+      // Bias correction prevents a tiny first step: displacement ≈ lr from step one.
+      assertEquals(lr, firstDisplacement, 1e-3);
+      // And the per-step displacement stays constant under a constant gradient.
+      assertEquals(firstDisplacement, secondDisplacement, DELTA);
     }
   }
 

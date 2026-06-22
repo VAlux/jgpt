@@ -17,10 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VectorTest {
 
-  private static final double DELTA = 1e-9;
+  // Values are stored as float (~1e-7 precision), so assertions use a float-scale tolerance.
+  private static final double DELTA = 1e-5;
 
   private static AutoGradNode leaf(double value) {
-    return new AutoGradNode(value, new double[0], List.of());
+    return new AutoGradNode(value, new float[0], List.of());
   }
 
   private static double[] values(Vector vector) {
@@ -80,7 +81,7 @@ class VectorTest {
 
       // f(a, b) = a + b -> df/da = df/db = 1
       assertIterableEquals(List.of(left, right), sum.children());
-      assertArrayEquals(new double[]{1d, 1d}, sum.childGrads());
+      assertArrayEquals(new float[]{1f, 1f}, sum.childGrads());
     }
 
     @Test
@@ -216,7 +217,7 @@ class VectorTest {
       AutoGradNode result = new Vector(List.of(a0, a1)).dotProduct(new Vector(List.of(b0, b1)));
 
       assertIterableEquals(List.of(a0, b0, a1, b1), result.children());
-      assertArrayEquals(new double[]{5d, 2d, 7d, 3d}, result.childGrads());
+      assertArrayEquals(new float[]{5f, 2f, 7f, 3f}, result.childGrads());
     }
 
     @Test

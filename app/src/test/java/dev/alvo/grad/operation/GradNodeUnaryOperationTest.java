@@ -14,14 +14,14 @@ class GradNodeUnaryOperationTest {
   private static final double DELTA = 1e-9;
 
   private static AutoGradNode leaf(double value) {
-    return new AutoGradNode(value, List.of(), List.of());
+    return new AutoGradNode(value, new double[0], List.of());
   }
 
   private static void assertChildGrads(AutoGradNode node, double... expected) {
-    List<Double> actual = node.childGrads();
-    assertEquals(expected.length, actual.size(), "child-grad count");
+    double[] actual = node.childGrads();
+    assertEquals(expected.length, actual.length, "child-grad count");
     for (int i = 0; i < expected.length; i++) {
-      assertEquals(expected[i], actual.get(i), DELTA, "child-grad[" + i + "]");
+      assertEquals(expected[i], actual[i], DELTA, "child-grad[" + i + "]");
     }
   }
 

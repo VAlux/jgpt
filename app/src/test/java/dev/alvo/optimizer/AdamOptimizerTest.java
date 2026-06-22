@@ -19,7 +19,7 @@ class AdamOptimizerTest {
 
   /** A parameter node seeded with a value and a pending gradient. */
   private static AutoGradNode param(double value, double grad) {
-    return new AutoGradNode(value, grad, List.of(), List.of());
+    return new AutoGradNode(value, grad, new double[0], List.of());
   }
 
   @Nested

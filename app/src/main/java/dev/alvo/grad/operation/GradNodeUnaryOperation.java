@@ -13,7 +13,7 @@ sealed interface GradNodeUnaryOperation extends GradNodeOperation {
     public AutoGradNode nodes(AutoGradNode node) {
       return new AutoGradNode(
         -node.value(),
-        List.of(-1d),
+        new double[]{-1d},
         List.of(node));
     }
   }
@@ -24,7 +24,7 @@ sealed interface GradNodeUnaryOperation extends GradNodeOperation {
     public AutoGradNode nodes(AutoGradNode node) {
       return new AutoGradNode(
         Math.log(node.value()),
-        List.of(1d / node.value()),
+        new double[]{1d / node.value()},
         List.of(node)
       );
     }
@@ -37,7 +37,7 @@ sealed interface GradNodeUnaryOperation extends GradNodeOperation {
 
       return new AutoGradNode(
         exp,
-        List.of(exp),
+        new double[]{exp},
         List.of(node)
       );
     }
@@ -49,7 +49,7 @@ sealed interface GradNodeUnaryOperation extends GradNodeOperation {
     public AutoGradNode nodes(AutoGradNode node) {
       return new AutoGradNode(
         Math.max(0, node.value()),
-        List.of(node.value() > 0 ? 1d : 0d),
+        new double[]{node.value() > 0 ? 1d : 0d},
         List.of(node)
       );
     }

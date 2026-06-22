@@ -116,7 +116,7 @@ public record Vector(List<AutoGradNode> nodes) implements Serializable {
       childGrads.add(currentNodes.value());
     }
 
-    return new AutoGradNode(value, childGrads, children);
+    return new AutoGradNode(value, childGrads.stream().mapToDouble(Double::doubleValue).toArray(), children);
   }
 
   /**

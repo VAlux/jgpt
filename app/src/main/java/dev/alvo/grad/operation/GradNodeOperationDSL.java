@@ -11,7 +11,7 @@ import dev.alvo.grad.operation.GradNodeUnaryOperation.Log;
 import dev.alvo.grad.operation.GradNodeUnaryOperation.Neg;
 import dev.alvo.grad.operation.GradNodeUnaryOperation.ReLU;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class GradNodeOperationDSL {
@@ -44,9 +44,10 @@ public class GradNodeOperationDSL {
 
   public static AutoGradNode sum(List<AutoGradNode> nodes) {
     var sum = nodes.stream().mapToDouble(AutoGradNode::value).sum();
-    var grads = Collections.nCopies(nodes.size(), 1d);
+    double[] gradsArray = new double[nodes.size()];
+    Arrays.fill(gradsArray, 1d);
 
-    return new AutoGradNode(sum, grads, nodes);
+    return new AutoGradNode(sum, gradsArray, nodes);
   }
 
   public static AutoGradNode add(AutoGradNode left, AutoGradNode right) {

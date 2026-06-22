@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,14 +20,16 @@ class VectorTest {
   private static final double DELTA = 1e-9;
 
   private static AutoGradNode leaf(double value) {
-    return new AutoGradNode(value, List.of(), List.of());
+    return new AutoGradNode(value, new double[0], List.of());
   }
 
   private static double[] values(Vector vector) {
     return vector.nodes().stream().mapToDouble(AutoGradNode::value).toArray();
   }
 
-  /** Reference softmax computed independently of the production code, with the same max-shift. */
+  /**
+   * Reference softmax computed independently of the production code, with the same max-shift.
+   */
   private static double[] expectedSoftmax(double... xs) {
     double max = Arrays.stream(xs).max().orElse(0d);
     double[] exps = Arrays.stream(xs).map(x -> Math.exp(x - max)).toArray();
@@ -77,7 +80,7 @@ class VectorTest {
 
       // f(a, b) = a + b -> df/da = df/db = 1
       assertIterableEquals(List.of(left, right), sum.children());
-      assertIterableEquals(List.of(1d, 1d), sum.childGrads());
+      assertArrayEquals(new double[]{1d, 1d}, sum.childGrads());
     }
 
     @Test
@@ -89,8 +92,8 @@ class VectorTest {
 
       a.add(b);
 
-      assertEquals(1d, a.nodes().get(0).value(), DELTA);
-      assertEquals(4d, b.nodes().get(0).value(), DELTA);
+      assertEquals(1d, a.nodes().getFirst().value(), DELTA);
+      assertEquals(4d, b.nodes().getFirst().value(), DELTA);
     }
 
     @Test
@@ -213,7 +216,7 @@ class VectorTest {
       AutoGradNode result = new Vector(List.of(a0, a1)).dotProduct(new Vector(List.of(b0, b1)));
 
       assertIterableEquals(List.of(a0, b0, a1, b1), result.children());
-      assertIterableEquals(List.of(5d, 2d, 7d, 3d), result.childGrads());
+      assertArrayEquals(new double[]{5d, 2d, 7d, 3d}, result.childGrads());
     }
 
     @Test

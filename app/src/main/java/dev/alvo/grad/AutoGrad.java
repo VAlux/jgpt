@@ -18,7 +18,7 @@ public class AutoGrad {
       var children = node.children();
       for (int i = 0; i < children.size(); i++) {
         var child = children.get(i);
-        child.setGrad(child.grad() + node.grad() * node.childGrads().get(i));
+        child.setGrad(child.grad() + node.grad() * node.childGrads()[i]);
       }
     }
   }

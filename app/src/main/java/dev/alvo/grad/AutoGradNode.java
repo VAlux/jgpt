@@ -4,6 +4,7 @@ import dev.alvo.grad.operation.GradNodeOperationDSL;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public final class AutoGradNode implements Serializable {
 
   private double value;
   private double grad;
-  private List<Double> childGrads;
+  private double[] childGrads;
   private List<AutoGradNode> children;
   private GradNodeTopologicalLookupState topologicalState = GradNodeTopologicalLookupState.UNVISITED;
 
@@ -23,17 +24,17 @@ public final class AutoGradNode implements Serializable {
   }
 
   public AutoGradNode(double value) {
-    this(value, 0d, List.of(), List.of());
+    this(value, 0d, new double[0], List.of());
   }
 
-  public AutoGradNode(double value, double grad, List<Double> childGrads, List<AutoGradNode> children) {
+  public AutoGradNode(double value, double grad, double[] childGrads, List<AutoGradNode> children) {
     this.value = value;
     this.grad = grad;
     this.childGrads = childGrads;
     this.children = children;
   }
 
-  public AutoGradNode(double value, List<Double> childGrads, List<AutoGradNode> children) {
+  public AutoGradNode(double value, double[] childGrads, List<AutoGradNode> children) {
     this(value, 0d, childGrads, children);
   }
 
@@ -53,11 +54,11 @@ public final class AutoGradNode implements Serializable {
     this.grad = grad;
   }
 
-  public List<Double> childGrads() {
+  public double[] childGrads() {
     return this.childGrads;
   }
 
-  public void setChildGrads(List<Double> childGrads) {
+  public void setChildGrads(double[] childGrads) {
     this.childGrads = childGrads;
   }
 
@@ -82,7 +83,7 @@ public final class AutoGradNode implements Serializable {
     return "AutoGradNode{" +
       "value=" + value +
       ", grad=" + grad +
-      ", childGrads=" + childGrads +
+      ", childGrads=" + Arrays.toString(childGrads) +
       ", children=" + children.size() +
       '}';
   }
@@ -91,12 +92,16 @@ public final class AutoGradNode implements Serializable {
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
     AutoGradNode that = (AutoGradNode) o;
-    return Double.compare(value, that.value) == 0 && Double.compare(grad, that.grad) == 0 && Objects.equals(childGrads, that.childGrads) && Objects.equals(children, that.children);
+    return Double.compare(value, that.value) == 0
+      && Double.compare(grad, that.grad) == 0
+      && Objects.deepEquals(childGrads, that.childGrads)
+      && Objects.equals(children, that.children)
+      && topologicalState == that.topologicalState;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(value, grad, childGrads, children);
+    return Objects.hash(value, grad, Arrays.hashCode(childGrads), children, topologicalState);
   }
 
   public AutoGradNode relu() {

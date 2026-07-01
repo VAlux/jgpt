@@ -1,6 +1,6 @@
 package dev.alvo.cli;
 
-import dev.alvo.Runner;
+import dev.alvo.Inference;
 import dev.alvo.TrainingConfig;
 import dev.alvo.model.Model;
 import dev.alvo.repository.DataRepository;
@@ -112,7 +112,7 @@ public class JGPTCommand implements Runnable {
       new ByteArrayModelDataStorage(),
       new ModelNameBuilder(type.extension()));
 
-    var runner = new Runner(gptModel, randomGenerator, saveRepository);
+    var runner = new Inference(gptModel, randomGenerator, saveRepository);
 
     var trainedModelData = loadExistingModel()
       .orElseGet(() -> trainModel(runner, tokenizer, saveRepository, random));
@@ -143,7 +143,7 @@ public class JGPTCommand implements Runnable {
     return Optional.of(loaded);
   }
 
-  private ModelData trainModel(Runner runner,
+  private ModelData trainModel(Inference inference,
                                CodePointTokenizer tokenizer,
                                DataRepository repository,
                                Random random) {
@@ -162,7 +162,7 @@ public class JGPTCommand implements Runnable {
       temperature);
 
     System.out.println("Starting model training...");
-    var trainedModelData = runner.train(tokenizer, dataset, config, random);
+    var trainedModelData = inference.train(tokenizer, dataset, config, random);
     repository.save(trainedModelData);
 
     return trainedModelData;
@@ -180,7 +180,7 @@ public class JGPTCommand implements Runnable {
     }
   }
 
-  private void repl(Runner runner, ModelData trainedModelData, RandomGenerator randomGenerator) {
+  private void repl(Inference inference, ModelData trainedModelData, RandomGenerator randomGenerator) {
     var consoleReader = new BufferedReader(new InputStreamReader(System.in));
     while (true) {
       System.out.print("|> ");
@@ -191,7 +191,7 @@ public class JGPTCommand implements Runnable {
         return;
       }
 
-      var result = runner.sample(
+      var result = inference.sample(
         input.toUpperCase(Locale.ROOT),
         trainedModelData.params(),
         trainedModelData.tokenizer(),

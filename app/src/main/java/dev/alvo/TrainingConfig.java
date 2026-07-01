@@ -2,7 +2,7 @@ package dev.alvo;
 
 /**
  * Bundles the training and model-architecture hyperparameters supplied on the command line and
- * passed to {@link Runner#train}. Grouping them in one carrier keeps the {@code train} signature
+ * passed to {@link Inference#train}. Grouping them in one carrier keeps the {@code train} signature
  * readable as the set of tunables grows.
  */
 public record TrainingConfig(

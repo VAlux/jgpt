@@ -43,7 +43,7 @@ class RunnerTest {
     // temperature == 0 takes the argmax path, so repeated runs over identical
     // weights must produce identical output (no sampling involved).
     var params = buildParams(16, new Random(42));
-    var runner = new Runner(new Model(), this.randomGenerator, this.dataRepository);
+    var runner = new Inference(new Model(), this.randomGenerator, this.dataRepository);
 
     String first = runner.predict(params, tokenizer, "hello", 0d);
     String second = runner.predict(params, tokenizer, "hello", 0d);
@@ -56,7 +56,7 @@ class RunnerTest {
   void samplingPathProducesOutputWithoutError() {
     // temperature > 0 exercises the softmax + cumulative-sampling branch.
     var params = buildParams(16, new Random(42));
-    var runner = new Runner(new Model(), this.randomGenerator, this.dataRepository);
+    var runner = new Inference(new Model(), this.randomGenerator, this.dataRepository);
 
     String output = runner.predict(params, tokenizer, "hello", 1.0d);
 
@@ -67,7 +67,7 @@ class RunnerTest {
   void handlesEmptyPrompt() {
     // encode("") is [BOS, EOS]; predict drops the trailing EOS and still generates.
     var params = buildParams(16, new Random(42));
-    var runner = new Runner(new Model(), this.randomGenerator, this.dataRepository);
+    var runner = new Inference(new Model(), this.randomGenerator, this.dataRepository);
 
     String output = runner.predict(params, tokenizer, "", 0d);
 
@@ -77,7 +77,7 @@ class RunnerTest {
   @Test
   void throwsWhenPromptExceedsMaxSequenceLength() {
     var params = buildParams(2, new Random(42));
-    var runner = new Runner(new Model(), this.randomGenerator, this.dataRepository);
+    var runner = new Inference(new Model(), this.randomGenerator, this.dataRepository);
 
     var exception = assertThrows(
       IllegalArgumentException.class,
